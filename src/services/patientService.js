@@ -3,6 +3,8 @@ require('dotenv').config();
 import emailService from "./emailService"
 import { v4 as uuidv4 } from 'uuid'
 
+const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
+
 let buildUrlEmail = (doctorId, token) => {
     let result = `${process.env.URL_REACT}/verify-booking?token=${token}&doctorId=${doctorId}`;
     return result;
@@ -57,6 +59,32 @@ let postBookAppointment = (data) => {
                             token: token
                         }
                     })
+
+                    let count = await db.Booking.count({
+                        where: {
+                            statusId: 'S1',
+                            date: data.date,
+                            timeType: data.timeType,
+                            doctorId: data.doctorId
+                        },
+                    })
+
+                    if (count > MAX_NUMBER_SCHEDULE) {
+                        resolve({
+                            errCode: 3,
+                            errMessage: "Sorry schedules are full now!"
+                        })
+                    } else {
+                        await db.Schedule.update(
+                            { currentNumber: count },
+                            {
+                                where: {
+                                    date: data.date,
+                                    timeType: data.timeType,
+                                    doctorId: data.doctorId
+                                }
+                            });
+                    }
                 }
             }
             resolve({

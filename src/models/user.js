@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
     roleId: DataTypes.STRING,
     phonenumber: DataTypes.STRING,
     positionId: DataTypes.STRING,
-    image: DataTypes.STRING
+    image: DataTypes.TEXT('long')
   }, {
     sequelize,
     modelName: 'User',

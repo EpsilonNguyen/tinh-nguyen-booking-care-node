@@ -1,7 +1,7 @@
 import db from "../models/index";
 require('dotenv').config();
 import _ from 'lodash';
-import emailService from './emailService'
+import emailService from './emailService';
 
 const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 
@@ -97,7 +97,7 @@ let postInforDoctorsService = (data) => {
                 }
                 else if (data.action === 'EDIT') {
                     let doctorMarkdown = await db.Markdown.findOne({
-                        where: { doctorid: data.doctorId },
+                        where: { doctorId: data.doctorId },
                         raw: false
                     })
 
@@ -196,7 +196,7 @@ let getDetailDoctorById = (inputId) => {
                 })
 
                 if (res && res.image) {
-                    res.image = new Buffer(res.image, 'base64').toString('binary');
+                    res.image = res.image;
                 }
 
                 if (!res) {
@@ -411,7 +411,7 @@ let getProfileDoctroById = (doctorId) => {
                 })
 
                 if (data && data.image) {
-                    data.image = new Buffer(data.image, 'base64').toString('binary');
+                    data.image = data.image;
                 }
 
                 if (!data) data = {};
@@ -464,7 +464,7 @@ let getListPatientForDoctor = (doctorId, date) => {
                 })
 
                 if (data && data.image) {
-                    data.image = new Buffer(data.image, 'base64').toString('binary');
+                    data.image = data.image;
                 }
 
                 if (!data) data = {};

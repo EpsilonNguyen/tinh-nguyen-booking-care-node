@@ -9,7 +9,7 @@ module.exports = {
                 type: Sequelize.INTEGER
             },
             image: {
-                type: Sequelize.BLOB('long')
+                type: Sequelize.TEXT('long')
             },
             name: {
                 type: Sequelize.STRING
