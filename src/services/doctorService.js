@@ -502,6 +502,7 @@ let sendRemedy = (data) => {
                 })
 
                 if (appointment) {
+                    //update statusId = S3
                     appointment.statusId = 'S3';
                     await appointment.save();
                 }

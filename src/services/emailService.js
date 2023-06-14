@@ -31,9 +31,13 @@ let getBodyHTMLEmail = (dataSend) => {
         <p>Thông tin đặt lịch khám bệnh:</p>
         <div><b>Thời gian: ${dataSend.time}</b></div>
         <div><b>Thời gian: ${dataSend.doctorName}</b></div>
-        <div>Vui lòng nhấn vào link sau:</div>
+        <div>Vui lòng nhấn vào link sau để xác nhận lịch hẹn đã đăng kí:</div>
         <div>
             <a href=${dataSend.redirectLink} target='_blank'>Click here</a>
+        </div>
+        <div>Bạn có thể hủy đăng kí lịch khám trong vòng 8 tiếng bằng cách nhấn vào link bên dưới:</div>
+        <div>
+            <a href=${dataSend.cancelLink} target='_blank'>Click here</a>
         </div>
         <div>Xin chân thành cảm ơn</div>
         `
@@ -52,7 +56,7 @@ let getBodyHTMLEmail = (dataSend) => {
         <div>Sincerely thank</div>
         `
     }
-    return result
+    return result;
 }
 
 let getBodyHTMLEmailRemedy = (dataSend) => {
