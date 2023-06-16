@@ -46,8 +46,25 @@ let getCountPatientByDate = async (req, res) => {
     }
 }
 
+let deleteSchedulePatientByDate = async (req, res) => {
+    try {
+        let data = req.body;
+        let response = await patientService.deleteSchedulePatientByDate(data);
+        return res.status(200).json(
+            response
+        );
+    } catch (error) {
+        console.log(error)
+        return res.status(200).json({
+            errCode: -1,
+            errMessage: "Error from server"
+        })
+    }
+}
+
 module.exports = {
     postBookAppointment: postBookAppointment,
     postVerifyBookAppointment: postVerifyBookAppointment,
-    getCountPatientByDate: getCountPatientByDate
+    getCountPatientByDate: getCountPatientByDate,
+    deleteSchedulePatientByDate: deleteSchedulePatientByDate
 }

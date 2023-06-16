@@ -237,8 +237,44 @@ let getCountPatientByDate = (date) => {
     })
 }
 
+let deleteSchedulePatientByDate = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let booking = await db.Booking.findOne({
+                where: {
+                    statusId: 'S2',
+                    doctorId: data.doctorId,
+                    patientId: data.patientId,
+                    timeType: data.timeType,
+                    date: data.date
+                },
+                raw: false
+            })
+
+            if (booking) {
+                await db.User.destroy({
+                    where: {
+                        id: booking.patientId,
+                    }
+                });
+
+                await booking.destroy();
+            }
+
+            resolve({
+                errCode: 0,
+                errMessage: 'Delete Schedule succeed!'
+            });
+        }
+        catch (error) {
+            reject(error);
+        }
+    })
+}
+
 module.exports = {
     postBookAppointment: postBookAppointment,
     postVerifyBookAppointment: postVerifyBookAppointment,
-    getCountPatientByDate: getCountPatientByDate
+    getCountPatientByDate: getCountPatientByDate,
+    deleteSchedulePatientByDate: deleteSchedulePatientByDate
 }
