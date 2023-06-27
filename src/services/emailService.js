@@ -30,7 +30,7 @@ let getBodyHTMLEmail = (dataSend) => {
             `<h3>Xin chào ${dataSend.patientName}</h3>
         <p>Thông tin đặt lịch khám bệnh:</p>
         <div><b>Thời gian: ${dataSend.time}</b></div>
-        <div><b>Thời gian: ${dataSend.doctorName}</b></div>
+        <div><b>Bác sĩ: ${dataSend.doctorName}</b></div>
         <div>Vui lòng nhấn vào link sau để xác nhận lịch hẹn đã đăng kí:</div>
         <div>
             <a href=${dataSend.redirectLink} target='_blank'>Click here</a>
@@ -48,7 +48,7 @@ let getBodyHTMLEmail = (dataSend) => {
             `<h3>Dear ${dataSend.patientName}</h3>
         <p>Thông tin đặt lịch khám bệnh:</p>
         <div><b>Thời gian: ${dataSend.time}</b></div>
-        <div><b>Thời gian: ${dataSend.doctorName}</b></div>
+        <div><b>Bác sĩ: ${dataSend.doctorName}</b></div>
         <div>Vui lòng nhấn vào link sau:</div>
         <div>
             <a href=${dataSend.redirectLink} target='_blank'>Click here</a>

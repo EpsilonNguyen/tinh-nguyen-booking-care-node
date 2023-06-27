@@ -21,71 +21,134 @@ let postBookAppointment = (data) => {
                     errMessage: "Missing required paramenters"
                 })
             } else {
+                if (data.email && data.email.includes('@gmail.com')) {
+                    let token = uuidv4();
+                    await emailService.sendSimpleEmail({
+                        reciverEmail: data.email,
+                        patientName: data.fullName,
+                        time: data.timeString,
+                        doctorName: data.doctorName,
+                        language: data.language,
+                        redirectLink: buildUrlEmail(data.doctorId, token, 'confirm'),
+                        cancelLink: buildUrlEmail(data.doctorId, token, 'cancel'),
+                    })
 
-                let token = uuidv4();
-                await emailService.sendSimpleEmail({
-                    reciverEmail: data.email,
-                    patientName: data.fullName,
-                    time: data.timeString,
-                    doctorName: data.doctorName,
-                    language: data.language,
-                    redirectLink: buildUrlEmail(data.doctorId, token, 'confirm'),
-                    cancelLink: buildUrlEmail(data.doctorId, token, 'cancel'),
-                })
-
-                //upsert patient
-                let user = await db.User.findOrCreate({
-                    where: { email: data.email },
-                    defaults: {
-                        email: data.email,
-                        roleId: "R3",
-                        gender: data.selectedGender,
-                        address: data.address,
-                        firstName: data.fullName
-                    }
-                });
-
-                //create a booking record
-                if (user && user[0]) {
-                    await db.Booking.findOrCreate({
-                        where: {
-                            patientId: user[0].id,
-                            date: data.date
-                        },
+                    //upsert patient with email
+                    let user = await db.User.findOrCreate({
+                        where: { email: data.email },
                         defaults: {
-                            statusId: 'S1',
-                            doctorId: data.doctorId,
-                            patientId: user[0].id,
-                            date: data.date,
-                            timeType: data.timeType,
-                            token: token
+                            email: data.email,
+                            roleId: "R3",
+                            gender: data.selectedGender,
+                            address: data.address,
+                            firstName: data.fullName,
+                            phonenumber: data.phoneNumber,
                         }
-                    })
+                    });
 
-                    let count = await db.Booking.count({
-                        where: {
-                            statusId: 'S1',
-                            date: data.date,
-                            timeType: data.timeType,
-                            doctorId: data.doctorId
-                        },
-                    })
-
-                    if (count > MAX_NUMBER_SCHEDULE) {
-                        resolve({
-                            errCode: 3,
-                            errMessage: "Sorry schedules are full now!"
+                    //create a booking record
+                    if (user && user[0]) {
+                        await db.Booking.findOrCreate({
+                            where: {
+                                patientId: user[0].id,
+                                date: data.date
+                            },
+                            defaults: {
+                                statusId: 'S1',
+                                doctorId: data.doctorId,
+                                patientId: user[0].id,
+                                date: data.date,
+                                timeType: data.timeType,
+                                token: token
+                            }
                         })
-                    } else {
-                        await db.Schedule.update(
-                            { currentNumber: count },
-                            {
-                                where: {
-                                    date: data.date,
-                                    timeType: data.timeType,
-                                    doctorId: data.doctorId
-                                }
-                            });
+
+                        let count = await db.Booking.count({
+                            where: {
+                                statusId: 'S1',
+                                date: data.date,
+                                timeType: data.timeType,
+                                doctorId: data.doctorId
+                            },
+                        })
+
+                        if (count > MAX_NUMBER_SCHEDULE) {
+                            resolve({
+                                errCode: 3,
+                                errMessage: "Sorry schedules are full now!"
+                            })
+                        } else {
+                            await db.Schedule.update(
+                                { currentNumber: count },
+                                {
+                                    where: {
+                                        date: data.date,
+                                        timeType: data.timeType,
+                                        doctorId: data.doctorId
+                                    }
+                                });
+                        }
+                    }
+                }
+                else {
+                    let token = uuidv4();
+
+                    //upsert patient with no email
+                    let user = await db.User.findOrCreate({
+                        where: { email: data.email },
+                        defaults: {
+                            email: data.email,
+                            roleId: "R3",
+                            gender: data.selectedGender,
+                            address: data.address,
+                            firstName: data.fullName,
+                            phonenumber: data.phoneNumber,
+                            password: '$2a$10$Mesvctld1jix2G/zpCzOKO1iVw2tgEdaKNTm4Lk7cRfvojeAbe4Ym'
+                        }
+                    });
+
+                    //create a booking record
+                    if (user && user[0]) {
+                        await db.Booking.findOrCreate({
+                            where: {
+                                patientId: user[0].id,
+                                date: data.date
+                            },
+                            defaults: {
+                                statusId: 'S1',
+                                doctorId: data.doctorId,
+                                patientId: user[0].id,
+                                date: data.date,
+                                timeType: data.timeType,
+                                token: token
+                            }
+                        })
+
+                        let count = await db.Booking.count({
+                            where: {
+                                statusId: 'S1',
+                                date: data.date,
+                                timeType: data.timeType,
+                                doctorId: data.doctorId
+                            },
+                        })
+
+                        if (count > MAX_NUMBER_SCHEDULE) {
+                            resolve({
+                                errCode: 3,
+                                errMessage: "Sorry schedules are full now!"
+                            })
+                        } else {
+                            await db.Schedule.update(
+                                { currentNumber: count },
+                                {
+                                    where: {
+                                        date: data.date,
+                                        timeType: data.timeType,
+                                        doctorId: data.doctorId
+                                    }
+                                });
+                        }
                     }
                 }
             }

@@ -428,6 +428,59 @@ let getProfileDoctroById = (doctorId) => {
     })
 }
 
+let getListScheduleForPatient = (patientId, date) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!patientId || !date) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required parameter'
+                })
+            } else {
+                let data = await db.Booking.findAll({
+                    where: {
+                        statusId: 'S1',
+                        patientId: patientId,
+                        date: date
+                    },
+                    include: [
+                        {
+                            model: db.User, as: 'patientData',
+                            attributes: ['email', 'firstName', 'address', 'gender'],
+                            include: [
+                                {
+                                    model: db.Allcode, as: 'genderData',
+                                    attributes: ['valueVi', 'valueEn']
+                                },
+                            ]
+                        },
+                        {
+                            model: db.Allcode, as: 'timeTypeDataPatient', attributes: ['valueEn', 'valueVi']
+                        }
+                    ],
+                    raw: false,
+                    nest: true
+
+                })
+
+                if (data && data.image) {
+                    data.image = data.image;
+                }
+
+                if (!data) data = {};
+
+                resolve({
+                    errCode: 0,
+                    data: data
+                })
+            }
+
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
 let getListPatientForDoctor = (doctorId, date) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -481,6 +534,7 @@ let getListPatientForDoctor = (doctorId, date) => {
     })
 }
 
+
 let sendRemedy = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -532,5 +586,6 @@ module.exports = {
     getExtraInforDoctroById: getExtraInforDoctroById,
     getProfileDoctroById: getProfileDoctroById,
     getListPatientForDoctor: getListPatientForDoctor,
+    getListScheduleForPatient: getListScheduleForPatient,
     sendRemedy: sendRemedy
 }
